@@ -259,8 +259,8 @@ class FinanzasApp(ctk.CTk):
         main_area.grid_columnconfigure((0, 1), weight=1)
         
         ahorro = self.datos_usuario.get("ahorro_mensual", 0)
-        ctk.CTkLabel(main_area, text="Has ahorrado", font=self.fuente_titulos, text_color=COLOR_TEXTO).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 5))
-        ctk.CTkLabel(main_area, text=f"COP {ahorro:,.0f} este mes.".replace(",", "."), font=self.fuente_titulos, text_color=COLOR_TEXTO).grid(row=1, column=0, columnspan=2, sticky="w", pady=(0, 30))
+        ctk.CTkLabel(main_area, text="Tienes", font=self.fuente_titulos, text_color=COLOR_TEXTO).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 5))
+        ctk.CTkLabel(main_area, text=f"COP {ahorro:,.0f} en tus bolsillos.".replace(",", "."), font=self.fuente_titulos, text_color=COLOR_TEXTO).grid(row=1, column=0, columnspan=2, sticky="w", pady=(0, 30))
 
         # Tarjetas
         self.crear_tarjeta(main_area, "Ingresos", "COP 500.000", "trend_up", 2, 0)
