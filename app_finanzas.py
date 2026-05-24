@@ -23,12 +23,24 @@ class SetupWindow(ctk.CTkToplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Bienvenido - Configuración Inicial")
-        self.geometry("400x450")
+        # Aumentamos un poco el alto para que quepa el logo
+        self.geometry("400x550")
+        self.resizable(False, False) # Bloquear redimensionamiento
         self.attributes("-topmost", True)
         self.parent = parent
         self.ruta_foto_seleccionada = None
         
-        ctk.CTkLabel(self, text="¡Bienvenido a tu Gestor Financiero!", font=("Inter", 20, "bold")).pack(pady=(30, 10))
+        # --- CARGAR LOGO DEL PROGRAMA ---
+        try:
+            img_logo = ctk.CTkImage(light_image=Image.open("assets/logo.png"), 
+                                    dark_image=Image.open("assets/logo.png"), 
+                                    size=(80, 80))
+            ctk.CTkLabel(self, image=img_logo, text="").pack(pady=(20, 0))
+        except Exception:
+            # Si no encuentra el logo, no crashea, simplemente no muestra imagen
+            pass
+        
+        ctk.CTkLabel(self, text="¡Bienvenido a tu Gestor Financiero!", font=("Inter", 20, "bold")).pack(pady=(20, 10))
         ctk.CTkLabel(self, text="Por favor, ingresa tus datos para comenzar.", text_color=COLOR_TEXTO_SECUNDARIO).pack(pady=(0, 20))
         
         self.entry_nombre = ctk.CTkEntry(self, placeholder_text="Tu nombre", width=250)
@@ -43,10 +55,14 @@ class SetupWindow(ctk.CTkToplevel):
         self.lbl_foto_estado = ctk.CTkLabel(self, text="Ninguna foto seleccionada", text_color=COLOR_TEXTO_SECUNDARIO)
         self.lbl_foto_estado.pack()
         
-        ctk.CTkButton(self, text="Guardar y Continuar", command=self.guardar_y_cerrar, fg_color=COLOR_PRIMARIO).pack(pady=40)
+        ctk.CTkButton(self, text="Guardar y Continuar", command=self.guardar_y_cerrar, fg_color=COLOR_PRIMARIO).pack(pady=30)
 
     def seleccionar_foto(self):
+        # Desactivamos topmost temporalmente para que el explorador de archivos se vea por encima
+        self.attributes("-topmost", False) 
         ruta = filedialog.askopenfilename(title="Seleccionar foto", filetypes=[("Archivos de imagen", "*.jpg *.jpeg *.png")])
+        self.attributes("-topmost", True) # Lo volvemos a activar
+        
         if ruta:
             self.ruta_foto_seleccionada = ruta
             self.lbl_foto_estado.configure(text="Foto seleccionada correctamente.")
@@ -91,6 +107,7 @@ class InputModal(ctk.CTkToplevel):
         super().__init__(parent)
         self.title(f"Nuevo {tipo_transaccion}")
         self.geometry("350x300")
+        self.resizable(False, False) # Bloquear redimensionamiento en el modal
         self.attributes("-topmost", True)
         self.parent = parent
         self.tipo = tipo_transaccion
@@ -114,15 +131,16 @@ class FinanzasApp(ctk.CTk):
         super().__init__()
         self.title("Dashboard Financiero")
         self.geometry("1100x700")
-        self.minsize(950, 600)
+        self.minsize(950, 600) # Bloquear redimensionamiento de la app principal
+        
         ctk.set_appearance_mode("dark")
         self.modo_actual = "dark"
         
         # FUENTE PERSONALIZADA INTER
-        self.fuente_titulos = ctk.CTkFont(family="Inter", size=28, weight="bold")
-        self.fuente_subtitulos = ctk.CTkFont(family="Inter", size=18)
-        self.fuente_normal = ctk.CTkFont(family="Inter", size=13, weight="bold")
-        self.fuente_pequena = ctk.CTkFont(family="Inter", size=12)
+        self.fuente_titulos = ctk.CTkFont(family="inter", size=28, weight="bold")
+        self.fuente_subtitulos = ctk.CTkFont(family="inter", size=18)
+        self.fuente_normal = ctk.CTkFont(family="inter", size=13, weight="bold")
+        self.fuente_pequena = ctk.CTkFont(family="inter", size=12)
 
         self.datos_usuario = {}
         self.verificar_primer_inicio()
@@ -211,7 +229,7 @@ class FinanzasApp(ctk.CTk):
         nombre_display = self.datos_usuario.get("nombre", "Usuario").split()[0]
         ctk.CTkLabel(frame_saludo, text=f"{nombre_display}!", font=self.fuente_normal, text_color=COLOR_TEXTO).pack(anchor="w")
 
-        # Botones Principales (Texto blanco puro en perfil)
+        # Botones Principales
         ctk.CTkButton(sidebar, text="Mi Perfil", fg_color=COLOR_PRIMARIO, text_color="#FFFFFF", font=self.fuente_normal).pack(pady=(0, 10), padx=20, fill="x")
         btn_billetera = ctk.CTkButton(sidebar, text="Billetera", fg_color=COLOR_FONDO_PRINCIPAL, text_color=COLOR_TEXTO, hover_color=COLOR_BARRAS_GRISES, font=self.fuente_normal)
         btn_billetera.pack(pady=(0, 20), padx=20, fill="x")
@@ -227,12 +245,12 @@ class FinanzasApp(ctk.CTk):
 
         for texto, nombre_icono, comando in opciones_nav:
             img_icono = self.cargar_icono_dinamico(nombre_icono, (20, 20))
-            btn = ctk.CTkButton(sidebar, text=f"   {texto}", image=img_icono, anchor="w", fg_color="transparent", text_color=COLOR_TEXTO, hover_color=COLOR_BARRAS_GRISES, font=self.fuente_normal, command=comando)
+            btn = ctk.CTkButton(sidebar, text=f"   {texto}", image=img_icono, anchor="w", fg_color="transparent", text_color=COLOR_TEXTO, hover_color=COLOR_FONDO_PRINCIPAL, font=self.fuente_normal, command=comando)
             btn.pack(pady=5, padx=20, fill="x")
 
         # Botón de Tema
         img_theme = self.cargar_icono_dinamico("theme_icon", (24, 24))
-        btn_theme = ctk.CTkButton(sidebar, text="", image=img_theme, width=40, fg_color="transparent", hover_color=COLOR_BARRAS_GRISES, command=self.toggle_theme)
+        btn_theme = ctk.CTkButton(sidebar, text="", image=img_theme, width=40, fg_color="transparent", hover_color=COLOR_PANELES, command=self.toggle_theme)
         btn_theme.pack(side="bottom", anchor="w", pady=20, padx=20)
 
         # ==================== ÁREA PRINCIPAL ====================
