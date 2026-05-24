@@ -6,7 +6,6 @@ import os
 import shutil
 from tkinter import filedialog, messagebox
 
-# --- CONFIGURACIÓN DE PALETA DE COLORES ---
 COLOR_PRIMARIO = "#4183FF"
 COLOR_FONDO_PRINCIPAL = ("#FFFFFF", "#282828")
 COLOR_PANELES = ("#F2F2F2", "#2F2F2F")
@@ -108,7 +107,6 @@ class FinanzasApp(ctk.CTk):
         ctk.set_appearance_mode("dark")
         self.modo_actual = "dark"
         
-        # FUENTES INTER
         self.fuente_titulos = ctk.CTkFont(family="Inter", size=28, weight="bold")
         self.fuente_subtitulos = ctk.CTkFont(family="Inter", size=18, weight="bold")
         self.fuente_normal = ctk.CTkFont(family="Inter", size=13, weight="bold")
@@ -174,22 +172,18 @@ class FinanzasApp(ctk.CTk):
             self.modo_actual = "dark"
 
     def construir_esqueleto_ui(self):
-        # Configurar rejilla general de la app
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
 
-        # BARRA LATERAL (Estatica)
         self.sidebar = ctk.CTkFrame(self, fg_color=COLOR_PANELES, width=220, corner_radius=0)
         self.sidebar.grid(row=0, column=0, sticky="nsew")
         self.sidebar.grid_propagate(False)
 
-        # --- SOLUCIÓN: CONTENEDOR PERMANENTE PARA EL PERFIL ---
         self.perfil_container = ctk.CTkFrame(self.sidebar, fg_color="transparent")
         self.perfil_container.pack(fill="x", pady=(30, 20), padx=10)
 
         self.actualizar_bloque_perfil_sidebar()
 
-        # Botones Principales de Navegación Estática
         ctk.CTkButton(self.sidebar, text="Mi Perfil", fg_color=COLOR_PRIMARIO, text_color="#FFFFFF", font=self.fuente_normal, command=lambda: self.mostrar_vista("perfil")).pack(pady=(0, 10), padx=20, fill="x")
         ctk.CTkButton(self.sidebar, text="Billetera", fg_color=COLOR_FONDO_PRINCIPAL, text_color=COLOR_TEXTO, hover_color=COLOR_BARRAS_GRISES, font=self.fuente_normal, command=lambda: self.mostrar_vista("billetera")).pack(pady=(0, 20), padx=20, fill="x")
 
@@ -209,12 +203,11 @@ class FinanzasApp(ctk.CTk):
         btn_theme = ctk.CTkButton(self.sidebar, text="", image=img_theme, width=40, fg_color="transparent", hover_color=COLOR_BARRAS_GRISES, command=self.toggle_theme)
         btn_theme.pack(side="bottom", anchor="w", pady=20, padx=20)
 
-        # ÁREA DE CONTENIDO PRINCIPAL DINÁMICO
         self.main_area = ctk.CTkFrame(self, fg_color="transparent", corner_radius=0)
         self.main_area.grid(row=0, column=1, sticky="nsew", padx=30, pady=30)
 
     def actualizar_bloque_perfil_sidebar(self):
-        # Limpiar el contenedor antes de redibujar
+
         for widget in self.perfil_container.winfo_children():
             widget.destroy()
         
@@ -249,12 +242,10 @@ class FinanzasApp(ctk.CTk):
         elif vista == "historial":
             self.render_historial()
 
-    # ==================== PANTALLA: PERFIL ====================
     def render_perfil(self):
         container = ctk.CTkFrame(self.main_area, fg_color="transparent")
         container.pack(expand=True, fill="both", pady=40)
 
-        # Imagen interactiva (Click para cambiar)
         img_perfil = self.crear_imagen_circular(self.datos_usuario.get("foto", "assets/default_profile.png"), (130, 130))
         btn_foto = ctk.CTkButton(container, image=img_perfil, text="", fg_color="transparent", hover=False, command=self.cambiar_foto_desde_perfil)
         btn_foto.pack(pady=10)
@@ -299,9 +290,8 @@ class FinanzasApp(ctk.CTk):
         except ValueError:
             messagebox.showerror("Error", "El salario debe ser un número válido.")
 
-    # ==================== PANTALLA: BILLETERA ====================
+
     def render_billetera(self):
-        # Icono de Billetera Centrado Superior
         img_billetera = self.cargar_icono_dinamico("billetera_centrada", (70, 70))
         ctk.CTkLabel(self.main_area, image=img_billetera, text="").pack(pady=(10, 5))
         
@@ -310,21 +300,20 @@ class FinanzasApp(ctk.CTk):
         total = self.datos_usuario.get("billetera_total", 0.0)
         ctk.CTkLabel(self.main_area, text=f"COP {total:,.0f}".replace(",", "."), font=self.fuente_titulos, text_color=COLOR_PRIMARIO).pack(pady=(0, 20))
 
-        # Contenedor de Última Entrada y Salida estructurados de forma vertical fija
         self.render_modulo_ultimos_movimientos()
 
     def render_modulo_ultimos_movimientos(self):
         frame_movimientos = ctk.CTkFrame(self.main_area, fg_color="transparent")
         frame_movimientos.pack(fill="x", padx=40, pady=10)
 
-        # Filtrar datos
+
         transacciones = self.datos_usuario.get("transacciones", [])
         entradas = [t for t in transacciones if t["tipo"] == "Ingreso"]
         salidas = [t for t in transacciones if t["tipo"] == "Gasto"]
 
-        # Fila de Entrada
+
         self.crear_fila_movimiento(frame_movimientos, "Última Entrada", entradas[-1] if entradas else None, "trend_up")
-        # Fila de Salida
+
         self.crear_fila_movimiento(frame_movimientos, "Última Salida", salidas[-1] if salidas else None, "trend_down")
 
     def crear_fila_movimiento(self, parent, titulo_bloque, transaccion, icono_nombre):
@@ -332,7 +321,7 @@ class FinanzasApp(ctk.CTk):
         container_fila.pack(fill="x", pady=8)
         container_fila.pack_propagate(False)
 
-        # Lado Izquierdo: Icono + Título del bloque
+     
         img_ico = self.cargar_icono_dinamico(icono_nombre, (24, 24))
         lbl_ico = ctk.CTkLabel(container_fila, image=img_ico, text="")
         lbl_ico.pack(side="left", padx=20)
@@ -340,7 +329,6 @@ class FinanzasApp(ctk.CTk):
         lbl_tit = ctk.CTkLabel(container_fila, text=titulo_bloque, font=self.fuente_subtitulos, text_color=COLOR_TEXTO)
         lbl_tit.pack(side="left")
 
-        # Lado Derecho: Monto y Razón alineados al fondo derecho
         frame_derecho = ctk.CTkFrame(container_fila, fg_color="transparent")
         frame_derecho.pack(side="right", padx=20, fill="y")
 
@@ -352,7 +340,6 @@ class FinanzasApp(ctk.CTk):
         else:
             ctk.CTkLabel(frame_derecho, text="Sin registros", font=self.fuente_normal, text_color=COLOR_TEXTO_SECUNDARIO).pack(side="right", pady=20)
 
-    # ==================== PANTALLAS: INGRESOS Y GASTOS ====================
     def render_ingresos_gastos(self, tipo):
         icono_central = "ingresos_centrados" if tipo == "Ingreso" else "gastos_centrados"
         img_central = self.cargar_icono_dinamico(icono_central, (70, 70))
@@ -360,7 +347,7 @@ class FinanzasApp(ctk.CTk):
 
         ctk.CTkLabel(self.main_area, text=f"Registrar {tipo}", font=self.fuente_titulos, text_color=COLOR_TEXTO).pack(pady=10)
 
-        # Formulario de Entrada
+
         form_frame = ctk.CTkFrame(self.main_area, fg_color="transparent")
         form_frame.pack(pady=10)
 
@@ -378,13 +365,13 @@ class FinanzasApp(ctk.CTk):
                 return
             try:
                 monto_f = float(monto)
-                # Actualizar el total de la billetera matemáticamente
+           
                 if tipo == "Ingreso":
                     self.datos_usuario["billetera_total"] += monto_f
                 else:
                     self.datos_usuario["billetera_total"] -= monto_f
 
-                # Guardar transacción
+            
                 self.datos_usuario["transacciones"].append({
                     "tipo": tipo,
                     "monto": monto_f,
@@ -399,7 +386,6 @@ class FinanzasApp(ctk.CTk):
 
         ctk.CTkButton(self.main_area, text=f"Añadir {tipo}", fg_color=COLOR_PRIMARIO, text_color="#FFFFFF", font=self.fuente_normal, command=ejecutar_registro).pack(pady=15)
 
-        # Historial específico al fondo inferior de la pantalla
         ctk.CTkLabel(self.main_area, text="Historial Reciente de esta Categoría", font=self.fuente_subtitulos, text_color=COLOR_TEXTO).pack(pady=(20, 5))
         
         frame_historial_interno = ctk.CTkFrame(self.main_area, fg_color="transparent")
@@ -416,14 +402,13 @@ class FinanzasApp(ctk.CTk):
         else:
             ctk.CTkLabel(frame_historial_interno, text=f"No hay {tipo.lower()}s registrados todavía.", font=self.fuente_normal, text_color=COLOR_TEXTO_SECUNDARIO).pack(pady=10)
 
-    # ==================== PANTALLA: METAS ====================
+  
     def render_metas(self):
         img_metas = self.cargar_icono_dinamico("metas_centradas", (65, 65))
         ctk.CTkLabel(self.main_area, image=img_metas, text="").pack(pady=(10, 5))
 
         ctk.CTkLabel(self.main_area, text="Mis Metas Financieras", font=self.fuente_titulos, text_color=COLOR_TEXTO).pack()
 
-        # Formulario Metas
         form_frame = ctk.CTkFrame(self.main_area, fg_color="transparent")
         form_frame.pack(pady=10)
 
@@ -451,7 +436,6 @@ class FinanzasApp(ctk.CTk):
 
         ctk.CTkButton(form_frame, text="Añadir Meta", fg_color=COLOR_PRIMARIO, width=100, font=self.fuente_normal, command=registrar_meta).pack(side="left", padx=5)
 
-        # Render de Lista de Metas Activas con estructura de medallas
         ctk.CTkLabel(self.main_area, text="Lista de Metas Activas", font=self.fuente_subtitulos, text_color=COLOR_TEXTO).pack(pady=(15, 5))
 
         scroll_metas = ctk.CTkScrollableFrame(self.main_area, fg_color="transparent", height=250)
@@ -474,7 +458,6 @@ class FinanzasApp(ctk.CTk):
                 txt_meta = f"{meta['nombre']} — Objetivo: COP {meta['monto']:,.0f}".replace(",", ".")
                 ctk.CTkLabel(row, text=txt_meta, font=self.fuente_normal, text_color=COLOR_TEXTO).pack(side="left", padx=10)
 
-                # Botón de Completado embebido en la fila de la derecha
                 btn_comp = ctk.CTkButton(row, text="Marcar como Completa", fg_color=COLOR_PRIMARIO, text_color="#FFFFFF", font=self.fuente_pequena, width=140, command=lambda i=idx: self.completar_meta(i))
                 btn_comp.pack(side="right", padx=15, pady=15)
         else:
@@ -486,7 +469,6 @@ class FinanzasApp(ctk.CTk):
         messagebox.showinfo("¡Felicidades!", f"¡Meta '{self.datos_usuario['metas'][indice]['nombre']}' completada con éxito!")
         self.mostrar_vista("metas")
 
-    # ==================== PANTALLA: HISTORIAL ====================
     def render_historial(self):
         img_hist = self.cargar_icono_dinamico("historial_centrado", (65, 65))
         ctk.CTkLabel(self.main_area, image=img_hist, text="").pack(pady=(10, 5))
