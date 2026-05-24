@@ -18,7 +18,6 @@ COLOR_BARRAS_GRISES = ("#B3B3B3", "#8C8C8C")
 ARCHIVO_DATOS = "datos_financieros.json"
 
 class SetupWindow(ctk.CTkToplevel):
-    """Ventana de configuración inicial para usuarios nuevos."""
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Bienvenido - Configuración Inicial")
